@@ -95,13 +95,77 @@ cd GitPulse
 pip install -r requirements.txt
 python app.py
 ```
+---
 
-## 👨‍💻 Contributors
+# 👥 Meet the Team
 
-  Name                  Role
-  --------------------- --------------
-  Aiswarya Maravarman   Project Lead
-  Arun                  Contributor
+<p align="center">
+  <b>The passionate minds behind GitPulse 🚀</b>
+</p>
+
+<table align="center">
+<tr>
+
+<td align="center" width="50%">
+
+<a href="https://github.com/aishumara2005">
+<img src="https://github.com/aishumara2005.png" width="140px" style="border-radius:50%;" alt="Aiswarya"/>
+
+### 👩‍💻 M. Aiswarya
+
+**🌟 Founder & Project Lead**
+
+AI & Data Science Engineer
+
+🏗️ System Architecture
+
+🤖 AI Integration
+
+⚙️ Backend Development
+
+📊 Dashboard Design
+
+<a href="https://github.com/aishumara2005">
+<img src="https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=github">
+</a>
+
+<a href="https://www.linkedin.com/in/aiswarya-maravarman-8a5550371/">
+<img src="https://img.shields.io/badge/LinkedIn-Profile-0A66C2?style=for-the-badge&logo=linkedin">
+</a>
+
+</td>
+
+<td align="center" width="50%">
+
+<a href="https://github.com/Arun15226">
+<img src="https://github.com/Arun15226.png" width="140px" style="border-radius:50%;" alt="Arun"/>
+
+### 👨‍💻 Arun
+
+**🚀 Project Contributor**
+
+Frontend Development
+
+🔒 Security Module
+
+🧪 Testing & Debugging
+
+🛠️ Feature Enhancement
+
+<a href="https://github.com/Arun15226">
+<img src="https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=github">
+</a>
+
+<a href="https://www.linkedin.com/in/kausik-arun-33626641b">
+<img src="https://img.shields.io/badge/LinkedIn-Profile-0A66C2?style=for-the-badge&logo=linkedin">
+</a>
+
+</td>
+
+</tr>
+</table>
+
+---
 
 ## 📜 License
 
