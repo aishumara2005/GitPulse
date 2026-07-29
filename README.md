@@ -1,89 +1,113 @@
+# 🚀 GitPulse -- AI Powered GitHub Team Intelligence Platform
 
-# 🚀 GitPulse – AI Powered GitHub Team Intelligence Platform
+> **Monitor • Analyze • Secure • Improve**
 
-> Monitor • Analyze • Secure • Improve Your GitHub Repositories with AI
+![Python](https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&logo=python)
+![Flask](https://img.shields.io/badge/Flask-Web_App-black?style=for-the-badge&logo=flask)
+![GitHub
+API](https://img.shields.io/badge/GitHub-API-success?style=for-the-badge&logo=github)
+![AI](https://img.shields.io/badge/AI-Claude-orange?style=for-the-badge)
 
-## About
-GitPulse is an AI-powered GitHub monitoring platform built with Python and Flask. It provides repository analytics, developer insights, AI recommendations, and security scanning.
+------------------------------------------------------------------------
 
-## Features
-- GitHub OAuth Authentication
-- Repository Analytics
-- Commit / PR / Issue Tracking
-- AI Insights
-- Secret Detection
-- Security Scanner
-- Dashboard
-- Email Notifications
+## 📌 Project Overview
 
-## Tech Stack
-- Python
-- Flask
-- HTML, CSS, JavaScript
-- Bootstrap
-- GitHub API
-- Claude AI API
+GitPulse is an AI-powered GitHub Team Intelligence Platform that helps
+developers and organizations monitor repositories, analyze contributor
+activity, scan code for security issues, and generate AI-powered
+insights through an interactive dashboard.
 
-## Installation
-```bash
+## ✨ Features
+
+-   🔐 GitHub OAuth Authentication
+-   📊 Repository Analytics
+-   👥 Contributor Insights
+-   🤖 AI Recommendations
+-   🛡️ Security & Secret Scanner
+-   📈 Interactive Dashboard
+-   📧 Email Notifications
+-   📂 Multi-Repository Ready
+
+## 🏗️ Workflow
+
+``` text
+GitHub Repository
+        │
+        ▼
+ GitHub API
+        │
+        ▼
+ Flask Backend
+        │
+ ┌──────┴────────┐
+ ▼               ▼
+AI Analysis  Security Scan
+ └──────┬────────┘
+        ▼
+ Analytics Dashboard
+        ▼
+ Email Notifications
+```
+
+## 🖼️ Architecture
+
+``` mermaid
+flowchart LR
+A[GitHub Repository]-->B[GitHub API]
+B-->C[Flask Backend]
+C-->D[AI Engine]
+C-->E[Security Scanner]
+D-->F[SQLite]
+E-->F
+F-->G[Dashboard]
+G-->H[Notifications]
+```
+
+## 🛠️ Tech Stack
+
+  Category   Technologies
+  ---------- ----------------------------------
+  Frontend   HTML, CSS, Bootstrap, JavaScript
+  Backend    Python, Flask
+  AI         Claude API
+  APIs       GitHub REST API
+  Database   SQLite
+
+## 📂 Project Structure
+
+``` text
+GitPulse/
+├── app.py
+├── ai_analyzer.py
+├── github_api.py
+├── security_scanner.py
+├── templates/
+├── static/
+├── requirements.txt
+└── README.md
+```
+
+## ⚙️ Installation
+
+``` bash
 git clone https://github.com/aishumara2005/GitPulse.git
 cd GitPulse
 pip install -r requirements.txt
 python app.py
 ```
 
-## Architecture
-```mermaid
-flowchart LR
-A[GitHub]-->B[GitHub API]
-B-->C[Flask Backend]
-C-->D[AI Analysis]
-C-->E[Security Scan]
-D-->F[Dashboard]
-E-->F
-```
+## 👨‍💻 Contributors
 
-## Contributors
+  Name                  Role
+  --------------------- --------------
+  Aiswarya Maravarman   Project Lead
+  Arun                  Contributor
 
-| Name | Role |
-|------|------|
-| Aiswarya Maravarman | Project Lead |
-| Arun | Contributor |
+## 📜 License
 
-GitHub:
-- https://github.com/aishumara2005
-- https://github.com/Arun15226
-
-## Badges
-Replace YOUR_REPOSITORY below.
-
-```md
-![Stars](https://img.shields.io/github/stars/aishumara2005/YOUR_REPOSITORY?style=for-the-badge)
-![Forks](https://img.shields.io/github/forks/aishumara2005/YOUR_REPOSITORY?style=for-the-badge)
-![Issues](https://img.shields.io/github/issues/aishumara2005/YOUR_REPOSITORY?style=for-the-badge)
-![License](https://img.shields.io/github/license/aishumara2005/YOUR_REPOSITORY?style=for-the-badge)
-```
-
-## GitHub Stats
-```md
-![Stats](https://github-readme-stats.vercel.app/api?username=aishumara2005&show_icons=true&theme=tokyonight)
-![Streak](https://streak-stats.demolab.com?user=aishumara2005&theme=tokyonight)
-![Trophies](https://github-profile-trophy.vercel.app/?username=aishumara2005&theme=algolia)
-```
-
-## Visitor Counter
-```md
-![Visitors](https://komarev.com/ghpvc/?username=aishumara2005&style=for-the-badge)
-```
-
-## Activity Graph
-```md
-![Graph](https://github-readme-activity-graph.vercel.app/graph?username=aishumara2005&theme=tokyo-night)
-```
-
-## License
 MIT License
 
-## Contact
-- GitHub: https://github.com/aishumara2005
-- LinkedIn: https://www.linkedin.com/in/aiswarya-maravarman-8a5550371/
+## 📬 Contact
+
+-   GitHub: https://github.com/aishumara2005
+-   LinkedIn: https://www.linkedin.com/in/aiswarya-maravarman-8a5550371/
