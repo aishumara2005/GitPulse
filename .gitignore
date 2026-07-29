@@ -1,0 +1,92 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# Distribution
+build/
+dist/
+*.egg-info/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Environment Variables
+.env
+.env.*
+
+# Flask
+instance/
+.webassets-cache/
+
+# SQLite
+*.db
+*.sqlite3
+
+# Logs
+*.log
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Uploaded files
+uploads/
+temp/
+tmp/
+
+# Secrets
+*.pem
+*.key
+*.crt
+
+# Node
+node_modules/
+
+# npm
+npm-debug.log*
+
+# Yarn
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage
+.coverage
+coverage.xml
+
+# Cache
+.cache/
+
+# Static generated files
+*.pyc
+
+# OS Files
+ehthumbs.db
+
+# Misc
+*.bak
+*.swp
