@@ -1,0 +1,1010 @@
+{% extends "base.html" %}
+{% block title %}GitPulse Dashboard{% endblock %}
+
+{% block extra_styles %}
+/* ── Existing Styles ── */
+.app-layout { display: flex; min-height: 100vh; position: relative; z-index: 1; }
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 240px; flex-shrink: 0;
+  background: rgba(10,14,26,0.95);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  position: fixed; left: 0; top: 0; bottom: 0; z-index: 100;
+  backdrop-filter: blur(16px);
+}
+.sidebar-logo {
+  padding: 20px 20px 16px;
+  display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 18px; box-shadow: 0 4px 12px var(--accent-glow);
+}
+.sidebar-logo-text { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+.sidebar-logo-text span { color: var(--accent); }
+
+.sidebar-nav { padding: 16px 12px; flex: 1; overflow-y: auto; }
+.nav-section-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--text-muted); padding: 0 8px; margin: 16px 0 6px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: var(--radius-sm);
+  color: var(--text-secondary); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s; margin-bottom: 2px;
+  text-decoration: none; border: 1px solid transparent;
+}
+.nav-item:hover { background: var(--accent-soft); color: var(--text-primary); border-color: var(--border); }
+.nav-item.active { background: var(--accent-soft); color: var(--accent); border-color: rgba(59,130,246,0.2); }
+.nav-item i { width: 16px; text-align: center; font-size: 14px; }
+
+.sidebar-user {
+  padding: 14px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.user-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 2px solid var(--accent); object-fit: cover;
+  flex-shrink: 0;
+}
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 11px; color: var(--text-muted); }
+
+/* ── Main Content ── */
+.main-content {
+  margin-left: 240px;
+  flex: 1;
+  padding: 28px;
+  min-height: 100vh;
+  max-width: calc(100vw - 240px);
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* ── Top Bar ── */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px;
+}
+.page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.4px; }
+.page-sub   { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+
+/* ── Repo Selector ── */
+.repo-select-wrap { position: relative; min-width: 260px; }
+.repo-select {
+  width: 100%;
+  background: var(--bg-surface); border: 1px solid var(--border);
+  color: var(--text-primary); border-radius: var(--radius-sm);
+  padding: 9px 36px 9px 12px; font-size: 13px; font-family: 'Inter', sans-serif;
+  appearance: none; outline: none; cursor: pointer; transition: border-color 0.2s;
+}
+.repo-select:focus { border-color: var(--accent); }
+.repo-select-icon {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  color: var(--text-muted); pointer-events: none; font-size: 12px;
+}
+
+/* ── Stats Row ── */
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card { padding: 20px; display: flex; flex-direction: column; gap: 6px; transition: transform 0.2s; }
+.stat-card:hover { transform: translateY(-2px); }
+.stat-label { font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-muted); }
+.stat-value { font-size: 28px; font-weight: 700; letter-spacing: -1px; }
+.stat-sub   { font-size: 12px; color: var(--text-secondary); }
+.stat-icon  { font-size: 20px; margin-bottom: 4px; }
+
+/* ── Grid ── */
+.content-grid { display: grid; grid-template-columns: 1fr 380px; gap: 20px; }
+.content-full { grid-column: 1 / -1; }
+
+/* ── Section Card ── */
+.section-card { padding: 24px; margin-bottom: 20px; }
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.section-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.section-count  {
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  border-radius: 99px; padding: 2px 10px; font-size: 11px; color: var(--text-secondary);
+}
+
+/* ── Member Cards ── */
+.members-list { display: flex; flex-direction: column; gap: 12px; }
+.member-card {
+  padding: 16px; border-radius: var(--radius-md);
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center;
+  transition: all 0.2s;
+}
+.member-card:hover { border-color: var(--border-glow); transform: translateX(2px); }
+.member-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
+.member-avatar-placeholder {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.member-info { min-width: 0; }
+.member-name  { font-size: 14px; font-weight: 600; }
+.member-stats { display: flex; gap: 14px; margin-top: 5px; }
+.member-stat  { font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
+.member-stat  i { color: var(--text-muted); font-size: 11px; }
+.member-last  { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+.member-right { text-align: right; flex-shrink: 0; }
+.activity-bar { width: 60px; height: 4px; background: var(--bg-surface); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+.activity-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+
+/* ── AI Suggestions ── */
+.suggestion-list { display: flex; flex-direction: column; gap: 12px; }
+.suggestion-item { padding: 14px; border-radius: var(--radius-sm); background: var(--bg-elevated); border-left: 3px solid var(--border); transition: all 0.2s; }
+.suggestion-item.high   { border-left-color: var(--red); }
+.suggestion-item.medium { border-left-color: var(--amber); }
+.suggestion-item.low    { border-left-color: var(--green); }
+.suggestion-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.suggestion-user   { font-size: 13px; font-weight: 600; }
+.suggestion-text   { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+/* ── Code Scanner ── */
+.scan-file { margin-bottom: 16px; }
+.scan-file-name { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-code); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.scan-issue { padding: 10px 12px; margin-bottom: 6px; border-radius: var(--radius-sm); background: var(--bg-surface); border-left: 3px solid; font-size: 12px; }
+.scan-issue.critical { border-left-color: var(--red); background: rgba(239,68,68,0.05); }
+.scan-issue.high     { border-left-color: var(--amber); background: rgba(245,158,11,0.05); }
+.scan-issue.medium   { border-left-color: var(--accent); background: rgba(59,130,246,0.05); }
+.scan-issue.low, .scan-issue.info { border-left-color: var(--text-muted); }
+.issue-line   { font-family: 'JetBrains Mono', monospace; color: var(--text-muted); font-size: 11px; }
+.issue-code   { font-family: 'JetBrains Mono', monospace; color: var(--text-code); margin: 4px 0; word-break: break-all; }
+.issue-msg    { color: var(--text-secondary); }
+
+/* Live Terminal UI Console Catch */
+.terminal-error-box { background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.25); border-left: 4px solid #ef4444; border-radius: var(--radius-sm); padding: 16px; margin-top: 15px; }
+.terminal-title { color: #ef4444; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+.terminal-code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: #0c101f; color: #fca5a5; padding: 12px; border-radius: 4px; margin-top: 8px; white-space: pre-wrap; word-break: break-all; border: 1px solid rgba(255,255,255,0.05); }
+
+/* ── Commits ── */
+.commit-item { padding: 12px 0; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; }
+.commit-item:last-child { border-bottom: none; }
+.commit-sha { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+.commit-msg { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.commit-author { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-top: 2px; }
+.commit-author-handle { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+.commit-date   { font-size: 11px; color: var(--text-muted); text-align: right; white-space: nowrap; }
+
+/* ── Loading & Empty States ── */
+.loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 48px; color: var(--text-muted); font-size: 13px; }
+.spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
+.empty-state-icon { font-size: 36px; margin-bottom: 12px; opacity: 0.5; }
+.scan-summary { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
+.scan-stat { padding: 12px; border-radius: var(--radius-sm); background: var(--bg-elevated); text-align: center; }
+.scan-stat-num { font-size: 20px; font-weight: 700; }
+.scan-stat-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
+
+/* ── Contribution Matrix Heatmap ── */
+.heatmap-wrapper { display: flex; flex-direction: column; gap: 4px; padding: 12px var(--radius-sm); background: rgba(255,255,255,0.01); border-radius: var(--radius-md); overflow-x: auto; margin-top: 10px; }
+.heatmap-months { display: grid; grid-template-columns: repeat(53, 11px); gap: 3px; margin-left: 30px; font-size: 10px; color: var(--text-muted); height: 16px; }
+.heatmap-main-grid { display: flex; gap: 8px; }
+.heatmap-days-labels { display: grid; grid-template-rows: repeat(7, 11px); gap: 3px; font-size: 9px; color: var(--text-muted); text-align: right; width: 22px; line-height: 11px; font-family: 'Inter', sans-serif; }
+.heatmap-container { display: grid; grid-template-rows: repeat(7, 11px); grid-auto-flow: column; gap: 3px; padding: 0 !important; width: max-content; }
+.heatmap-cell { width: 11px; height: 11px; border-radius: 2px; transition: transform 0.1s ease; position: relative; cursor: pointer; }
+.heatmap-cell:hover { transform: scale(1.3); z-index: 50; box-shadow: 0 0 6px rgba(255,255,255,0.2); }
+
+.badge-pill { font-size: 10px; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); color: var(--amber); padding: 1px 6px; border-radius: 4px; }
+.alert-priority { border-left: 3px solid var(--red) !important; background: rgba(239,68,68,0.03) !important; }
+.progress-bar-bg { width: 100%; height: 6px; background: var(--bg-surface); border-radius: 3px; overflow: hidden; margin-top: 8px; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--purple)); transition: width 0.4s; }
+
+/* ══════════════════════════════════════════════════
+   PATCH 1 — Fix: only the active tab should render.
+   This was the missing rule causing every section
+   (Team Activity, Leaderboard, Scanner, etc.) to show
+   stacked on one page at once.
+   ══════════════════════════════════════════════════ */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ══════════════════════════════════════════════════
+   PATCH 2 — Light theme: white background, light-blue
+   accents, replacing the dark theme. Overrides the CSS
+   variables used throughout the rest of the file.
+   ══════════════════════════════════════════════════ */
+:root {
+  --bg-base:        #f4f8fd;
+  --bg-surface:     #ffffff;
+  --bg-elevated:     #eef4fc;
+  --border:          #dbe7f6;
+  --border-glow:     #bcd9f5;
+  --accent:          #3b82f6;
+  --accent-soft:     rgba(59,130,246,0.08);
+  --accent-glow:     rgba(59,130,246,0.25);
+  --purple:          #8b5cf6;
+  --text-primary:    #16233a;
+  --text-secondary:  #4b5b73;
+  --text-muted:      #8496ad;
+  --text-code:       #2f5aa8;
+  --red:             #ef4444;
+  --red-soft:        rgba(239,68,68,0.08);
+  --amber:           #d97706;
+  --green:           #16a34a;
+  --radius-sm:       8px;
+  --radius-md:       12px;
+}
+
+body, .app-layout { background: var(--bg-base) !important; color: var(--text-primary); }
+.glass {
+  background: #ffffff !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 2px 10px rgba(59,130,246,0.06) !important;
+  backdrop-filter: none !important;
+}
+.sidebar { background: #ffffff !important; border-right: 1px solid var(--border); }
+.terminal-code { background: #f1f5fb !important; color: #b91c1c !important; }
+
+/* ══════════════════════════════════════════════════
+   PATCH 3 — Compact ("kutti") spacing: smaller padding,
+   tighter gaps, smaller heatmap cells, denser cards.
+   ══════════════════════════════════════════════════ */
+.main-content { padding: 16px; }
+.topbar { margin-bottom: 16px; }
+.page-title { font-size: 18px; }
+.page-sub { font-size: 12px; }
+
+.stats-row { gap: 10px; margin-bottom: 14px; }
+.stat-card { padding: 12px; gap: 3px; }
+.stat-value { font-size: 20px; }
+.stat-icon { font-size: 15px; margin-bottom: 0; }
+
+.section-card { padding: 14px; margin-bottom: 12px; }
+.section-header { margin-bottom: 12px; }
+.section-title { font-size: 13px; }
+
+.member-card { padding: 10px; gap: 10px; }
+.member-avatar, .member-avatar-placeholder { width: 34px; height: 34px; font-size: 14px; }
+.member-name { font-size: 13px; }
+.member-stats { gap: 10px; margin-top: 3px; }
+.member-stat { font-size: 11px; }
+
+.heatmap-cell { width: 9px; height: 9px; }
+.heatmap-container { grid-template-rows: repeat(7, 9px); gap: 2px; }
+.heatmap-days-labels { grid-template-rows: repeat(7, 9px); gap: 2px; }
+.heatmap-months { grid-template-columns: repeat(53, 9px); gap: 2px; }
+
+.content-grid { gap: 12px; }
+{% endblock %}
+
+{% block body %}
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">⚡</div>
+      <div class="sidebar-logo-text">Git<span>Pulse</span></div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Monitor</div>
+      <a class="nav-item active" onclick="showTab('activity')">
+        <i class="fa fa-chart-line"></i> Team Activity
+      </a>
+      <a class="nav-item" onclick="showTab('leaderboard')">
+        <i class="fa fa-trophy"></i> Leaderboard
+      </a>
+      <a class="nav-item" onclick="showTab('suggestions')">
+        <i class="fa fa-robot"></i> AI Suggestions
+      </a>
+      <a class="nav-item" onclick="showTab('scanner')">
+        <i class="fa fa-shield-halved"></i> Code Scanner
+      </a>
+      <a class="nav-item" onclick="showTab('security')">
+        <i class="fa fa-triangle-exclamation"></i> Security
+      </a>
+      <a class="nav-item" onclick="showTab('commits')">
+        <i class="fa fa-code-commit"></i> Commit History
+      </a>
+
+      <div class="nav-section-label" style="margin-top:24px">Integrations</div>
+      <a class="nav-item" onclick="triggerEmailNotifications()" id="email-nav-btn">
+        <i class="fa fa-paper-plane"></i> Run Email Alerts
+      </a>
+
+      <div class="nav-section-label" style="margin-top:16px">Account</div>
+      <a class="nav-item" href="/logout">
+        <i class="fa fa-right-from-bracket"></i> Sign Out
+      </a>
+    </nav>
+
+    <div class="sidebar-user">
+      {% if avatar %}
+      <img src="{{ avatar }}" class="user-avatar" alt="{{ username }}" />
+      {% else %}
+      <div class="member-avatar-placeholder" style="width:36px;height:36px;font-size:14px">{{ username[0].upper() if username else 'U' }}</div>
+      {% endif %}
+      <div class="user-info">
+        <div class="user-name">{{ name or username }}</div>
+        <div class="user-role" style="display:flex;align-items:center;gap:4px">
+          <div class="pulse-dot" style="width:6px;height:6px"></div> {{ user_role or 'Developer' }}
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div>
+        <div class="page-title" id="page-title">Team Activity</div>
+        <div class="page-sub" id="page-sub">Monitor who's active and who needs a nudge</div>
+      </div>
+      <div class="topbar-actions">
+        <div class="repo-select-wrap">
+          <select class="repo-select" id="repo-select" onchange="onRepoChange()">
+            <option value="">— Select a repository —</option>
+          </select>
+          <i class="fa fa-chevron-down repo-select-icon"></i>
+        </div>
+        <button class="btn btn-primary" onclick="refreshAll()" id="refresh-btn">
+          <i class="fa fa-rotate-right"></i> Refresh
+        </button>
+      </div>
+    </div>
+
+    <div class="stats-row" id="stats-row">
+      <div class="glass stat-card">
+        <div class="stat-icon" style="color:var(--accent)"><i class="fa fa-users"></i></div>
+        <div class="stat-label">Team Members</div>
+        <div class="stat-value" id="stat-members">—</div>
+        <div class="stat-sub">collaborators</div>
+      </div>
+      <div class="glass stat-card">
+        <div class="stat-icon" style="color:var(--green)"><i class="fa fa-circle-check"></i></div>
+        <div class="stat-label">Active (30d)</div>
+        <div class="stat-value" id="stat-active" style="color:var(--green)">—</div>
+        <div class="stat-sub">committed recently</div>
+      </div>
+      <div class="glass stat-card">
+        <div class="stat-icon" style="color:var(--amber)"><i class="fa fa-triangle-exclamation"></i></div>
+        <div class="stat-label">Inactive</div>
+        <div class="stat-value" id="stat-inactive" style="color:var(--amber)">—</div>
+        <div class="stat-sub">no commits in 30d</div>
+      </div>
+      <div class="glass stat-card">
+        <div class="stat-icon" style="color:var(--accent)"><i class="fa fa-file-pen"></i></div>
+        <div class="stat-label">Total Commits</div>
+        <div class="stat-value" id="stat-commits" style="color:var(--accent)">—</div>
+        <div class="stat-sub">last 30 days</div>
+      </div>
+    </div>
+
+    <div id="tab-activity" class="tab-panel active">
+      <div class="content-grid">
+        <div class="space-y-4">
+          <div class="glass section-card">
+            <div class="section-header">
+              <div class="section-title"><i class="fa fa-chart-bar"></i> Weekly Activity</div>
+              <div style="font-size:12px;color:var(--text-muted)">Commits vs Code Reviews</div>
+            </div>
+            <div style="height: 220px; position: relative;">
+              <canvas id="weeklyActivityChart"></canvas>
+            </div>
+          </div>
+
+          <div class="glass section-card">
+            <div class="section-header">
+              <div class="section-title"><i class="fa fa-calendar-days"></i> Contribution Heatmap Matrix</div>
+              <div style="font-size:12px;color:var(--text-muted)">Real-time calendar track mapping</div>
+            </div>
+            <div class="heatmap-wrapper">
+              <div class="heatmap-months" id="heatmap-months-labels"></div>
+              <div class="heatmap-main-grid">
+                <div class="heatmap-days-labels">
+                  <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                </div>
+                <div class="heatmap-container" id="heatmap-grid"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass section-card">
+            <div class="section-header">
+              <div class="section-title"><i class="fa fa-users"></i> Team Members <span class="section-count" id="member-count">0</span></div>
+              <div style="font-size:12px;color:var(--text-muted)">Last 30 days</div>
+            </div>
+            <div class="members-list" id="members-list">
+              <div class="loading-state"><div class="spinner"></div>Select a repository to load team data</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="glass section-card">
+            <div class="section-header">
+              <div class="section-title"><i class="fa fa-bell"></i> Smart Alerts</div>
+            </div>
+            <div class="suggestion-list" id="smart-alerts-list">
+              <div class="empty-state">No anomalous priority risks flagged.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-leaderboard" class="tab-panel">
+      <div class="glass section-card">
+        <div class="section-header">
+          <div class="section-title"><i class="fa fa-trophy"></i> Team Standings</div>
+          <div style="font-size:12px;color:var(--text-muted)">Rankings calculated by contribution performance</div>
+        </div>
+        <div class="members-list" id="leaderboard-list">
+          <div class="loading-state">Select a repository to view leaderboard arrays</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-suggestions" class="tab-panel">
+      <div class="glass section-card">
+        <div class="section-header">
+          <div class="section-title"><i class="fa fa-robot"></i> AI Suggestions</div>
+          <button class="btn btn-primary btn-sm" onclick="generateSuggestions()" id="ai-btn" style="padding:7px 14px;font-size:12px;">
+            <i class="fa fa-wand-magic-sparkles"></i> Generate
+          </button>
+        </div>
+        <div class="suggestion-list" id="suggestion-list">
+          <div class="empty-state">
+            <div class="empty-state-icon">🤖</div>
+            <div>Load a repository, then click Generate</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-scanner" class="tab-panel">
+      <div class="glass section-card">
+        <div class="section-header">
+          <div class="section-title"><i class="fa fa-shield-halved"></i> Code Scanner</div>
+          <button class="btn btn-primary" onclick="runScan()" id="scan-btn" style="padding:7px 14px;font-size:12px;">
+            <i class="fa fa-magnifying-glass"></i> Scan Repository
+          </button>
+        </div>
+        <div id="scan-summary-area"></div>
+        <div id="scan-results">
+          <div class="empty-state">
+            <div class="empty-state-icon">🔍</div>
+            <div>Select a repository and click Scan</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-security" class="tab-panel">
+      <div class="glass section-card">
+        <div class="section-header">
+          <div class="section-title"><i class="fa fa-triangle-exclamation"></i> Security &amp; Secret Scan</div>
+          <button class="btn btn-primary" onclick="runSecurityScan()" id="security-scan-btn" style="padding:7px 14px;font-size:12px;">
+            <i class="fa fa-magnifying-glass"></i> Scan for Secrets
+          </button>
+        </div>
+        <div id="security-results">
+          <div class="empty-state">
+            <div class="empty-state-icon">🔐</div>
+            <div>Select a repository and click Scan for Secrets</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-commits" class="tab-panel">
+      <div class="glass section-card">
+        <div class="section-header">
+          <div class="section-title"><i class="fa fa-code-commit"></i> Recent Commits</div>
+          <div style="font-size:12px;color:var(--text-muted)">Latest 20</div>
+        </div>
+        <div id="commits-list">
+          <div class="loading-state">Select a repository to view commits</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// ── Helper API Fetch ──
+async function apiFetch(url, options = {}) {
+  const res = await fetch(url, options);
+
+  const contentType = res.headers.get('content-type') || '';
+  const isJson = contentType.includes('application/json');
+
+  if (!isJson) {
+    // Backend returned HTML/text instead of JSON — usually means
+    // session expired (redirected to login) or a server crash page.
+    const rawText = await res.text().catch(() => '');
+    const preview = rawText.slice(0, 120).replace(/\s+/g, ' ').trim();
+    if (res.status === 200 || res.redirected) {
+      throw new Error('Session expired — please log out and log in again.');
+    }
+    throw new Error(`Server returned non-JSON response (status ${res.status}): ${preview || 'empty body'}`);
+  }
+
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.error_message || `API Error Status: ${res.status}`);
+  }
+  return res.json();
+}
+
+// ── State ──
+let currentRepo = null;
+let activityData = null;
+let activityChartInstance = null;
+
+const tabMeta = {
+  activity:     { title: 'Team Activity',     sub: 'Monitor who\'s active and who needs a nudge' },
+  leaderboard: { title: 'Leaderboard Rankings', sub: 'Gamified achievement standings across your engineers' },
+  suggestions: { title: 'AI Suggestions',    sub: 'Intelligent coaching for each team member' },
+  scanner:     { title: 'Code Scanner',      sub: 'Detect errors, security issues & technical debt' },
+  security:    { title: 'Security',          sub: 'Detect exposed .env files and credential leaks' },
+  commits:     { title: 'Commit History',    sub: 'Recent commit timeline across the team' },
+};
+
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  
+  const targetPanel = document.getElementById(`tab-${name}`);
+  if(targetPanel) targetPanel.classList.add('active');
+  
+  if (window.event && window.event.currentTarget) {
+    window.event.currentTarget.classList.add('active');
+  }
+  document.getElementById('page-title').textContent = tabMeta[name].title;
+  document.getElementById('page-sub').textContent   = tabMeta[name].sub;
+}
+
+async function loadRepos() {
+  try {
+    const repos = await apiFetch('/api/repos');
+    const sel = document.getElementById('repo-select');
+    repos.forEach(r => {
+      const opt = document.createElement('option');
+      opt.value = r.full_name;
+      opt.textContent = r.full_name + (r.private ? ' 🔒' : '');
+      sel.appendChild(opt);
+    });
+  } catch (e) {
+    console.error('Could not load repositories: ' + e.message);
+  }
+}
+
+async function onRepoChange() {
+  const sel = document.getElementById('repo-select');
+  currentRepo = sel.value;
+  if (!currentRepo) return;
+  await refreshAll();
+}
+
+async function refreshAll() {
+  if (!currentRepo) return;
+  const btn = document.getElementById('refresh-btn');
+  btn.innerHTML = '<div class="spinner"></div>';
+  btn.disabled = true;
+  
+  try {
+    await Promise.all([loadActivity(), loadCommits()]);
+    await runScan();
+    await runSecurityScan();
+    await generateSuggestions();
+  } catch(error) {
+    console.error("Automated background synchronization failed:", error);
+  } finally {
+    btn.innerHTML = '<i class="fa fa-rotate-right"></i> Refresh';
+    btn.disabled = false;
+  }
+}
+
+async function loadActivity() {
+  const listEl = document.getElementById('members-list');
+  listEl.innerHTML = '<div class="loading-state"><div class="spinner"></div>Loading team data…</div>';
+  try {
+    activityData = await apiFetch(`/api/team-activity?repo=${encodeURIComponent(currentRepo)}`);
+    renderActivity(activityData);
+    renderAdvancedMetrics(activityData);
+  } catch (e) {
+    listEl.innerHTML = `<div class="empty-state"><div class="empty-state-icon">❌</div>${e.message}</div>`;
+  }
+}
+
+function renderActivity(data) {
+  const members = data.members || {};
+  const keys = Object.keys(members);
+  document.getElementById('member-count').textContent = keys.length;
+
+  const now = new Date();
+  let active = 0, totalCommits = 0;
+  keys.forEach(k => {
+    totalCommits += members[k].commits || 0;
+    const last = members[k].last_commit;
+    if (last) {
+      const diff = (now - new Date(last)) / 86400000;
+      if (diff <= 30) active++;
+    }
+  });
+  document.getElementById('stat-members').textContent  = keys.length;
+  document.getElementById('stat-active').textContent   = active;
+  document.getElementById('stat-inactive').textContent = keys.length - active;
+  document.getElementById('stat-commits').textContent  = totalCommits;
+
+  const maxCommits = Math.max(...keys.map(k => members[k].commits || 0), 1);
+  const listEl = document.getElementById('members-list');
+  if (!keys.length) {
+    listEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div>No collaborators found</div>';
+    return;
+  }
+
+  const sorted = keys.sort((a, b) => (members[b].commits || 0) - (members[a].commits || 0));
+
+  listEl.innerHTML = sorted.map(login => {
+    const m = members[login];
+    const commits = m.commits || 0;
+    const prs     = m.prs_opened || 0;
+    const issues  = m.issues_opened || 0;
+    const pct     = Math.round((commits / maxCommits) * 100);
+    const lastRaw = m.last_commit;
+    let lastStr   = 'No commits yet';
+    let daysSince = 999;
+    if (lastRaw) {
+      daysSince = Math.floor((now - new Date(lastRaw)) / 86400000);
+      lastStr   = daysSince === 0 ? 'Today' : daysSince === 1 ? 'Yesterday' : `${daysSince} days ago`;
+    }
+
+    const status = commits === 0 ? 'inactive' : daysSince > 14 ? 'moderate' : 'active';
+    const barColor = status === 'active' ? 'var(--green)' : status === 'moderate' ? 'var(--amber)' : 'var(--red)';
+    const badge    = status === 'active' ? '<span class="badge badge-green">Active</span>' : status === 'moderate' ? '<span class="badge badge-amber">Low</span>' : '<span class="badge badge-red">Inactive</span>';
+    const avatarHtml = m.avatar ? `<img src="${m.avatar}" class="member-avatar" alt="${login}" />` : `<div class="member-avatar-placeholder">${login[0].toUpperCase()}</div>`;
+
+    return `
+    <div class="member-card">
+      ${avatarHtml}
+      <div class="member-info">
+        <div class="member-name"><a href="${m.profile || '#'}" target="_blank" style="color:inherit;text-decoration:none">${login}</a></div>
+        <div class="member-stats">
+          <span class="member-stat"><i class="fa fa-code-commit"></i> ${commits} commits</span>
+          <span class="member-stat"><i class="fa fa-code-pull-request"></i> ${prs} PRs</span>
+          <span class="member-stat"><i class="fa fa-circle-dot"></i> ${issues} issues</span>
+        </div>
+        <div class="member-last: Last commit: ${lastStr}"></div>
+        <div class="activity-bar">
+          <div class="activity-fill" style="width:${pct}%;background:${barColor}"></div>
+        </div>
+      </div>
+      <div class="member-right">${badge}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderAdvancedMetrics(data) {
+  const ctx = document.getElementById('weeklyActivityChart').getContext('2d');
+  const weeklyData = data.weekly_analytics || [
+    {day: 'Mon', commits: 5, reviews: 2}, {day: 'Tue', commits: 8, reviews: 4},
+    {day: 'Wed', commits: 12, reviews: 9}, {day: 'Thu', commits: 4, reviews: 1},
+    {day: 'Fri', commits: 7, reviews: 3}
+  ];
+
+  if (activityChartInstance) activityChartInstance.destroy();
+  activityChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: weeklyData.map(d => d.day),
+      datasets: [
+        { label: 'Commits', data: weeklyData.map(d => d.commits), backgroundColor: '#3b82f6' },
+        { label: 'Reviews', data: weeklyData.map(d => d.reviews), backgroundColor: '#10b981' }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        x: { stacked: true, ticks: { color: '#4b5b73' }, grid: { display: false } },
+        y: { stacked: true, ticks: { color: '#4b5b73' }, grid: { color: 'rgba(59,130,246,0.08)' } }
+      },
+      plugins: { legend: { labels: { color: '#16233a' } } }
+    }
+  });
+
+  const heatmapGrid = document.getElementById('heatmap-grid');
+  const monthsContainer = document.getElementById('heatmap-months-labels');
+  heatmapGrid.innerHTML = '';
+  monthsContainer.innerHTML = '';
+
+  const totalDays = 371;
+  const now = new Date();
+  const startDate = new Date();
+  startDate.setDate(now.getDate() - (totalDays - 1));
+
+  let htmlCells = [];
+  let lastMonthName = "";
+  let monthSpans = {};
+  const commitMap = data.commit_date_map || {};
+
+  for (let i = 0; i < totalDays; i++) {
+    const currentIterationDate = new Date(startDate);
+    currentIterationDate.setDate(startDate.getDate() + i);
+
+    const dateISO = currentIterationDate.toISOString().split('T')[0];
+    const dayName = currentIterationDate.toLocaleDateString('en-US', { weekday: 'long' });
+    const monthName = currentIterationDate.toLocaleDateString('en-US', { month: 'short' });
+    const displayDateStr = currentIterationDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+    // Real commit count only — no random fallback. Days with no data show as empty (0).
+    const commitCount = commitMap[dateISO] || 0;
+    const currentWeekIndex = Math.floor(i / 7);
+    if (monthName !== lastMonthName) {
+      if (!monthSpans[monthName]) monthSpans[monthName] = currentWeekIndex;
+      lastMonthName = monthName;
+    }
+
+    let color = 'rgba(59,130,246,0.06)';
+    if (commitCount > 0 && commitCount <= 2) color = '#a8d5a2';
+    else if (commitCount > 2 && commitCount <= 5) color = '#5fb85a';
+    else if (commitCount > 5 && commitCount <= 8) color = '#2f9e2a';
+    else if (commitCount > 8) color = '#1a7d16';
+
+    htmlCells.push(`<div class="heatmap-cell" style="background: ${color};" title="${commitCount} commits on ${dayName}, ${displayDateStr}"></div>`);
+  }
+  heatmapGrid.innerHTML = htmlCells.join('');
+
+  let monthsHtml = Array(53).fill('&nbsp;');
+  Object.keys(monthSpans).forEach(mName => {
+    const idx = monthSpans[mName];
+    if(idx < 53) monthsHtml[idx] = `<span>${mName}</span>`;
+  });
+  monthsContainer.innerHTML = monthsHtml.map(m => `<div style="overflow:visible; white-space:nowrap;">${m}</div>`).join('');
+
+  const leaderboardEl = document.getElementById('leaderboard-list');
+  const sortedMembers = Object.keys(data.members || {}).sort((a,b) => (data.members[b].commits || 0) - (data.members[a].commits || 0));
+  
+  if(sortedMembers.length > 0) {
+    leaderboardEl.innerHTML = sortedMembers.map((login, idx) => {
+      const m = data.members[login];
+      const badges = m.badges || ['Core Contributor'];
+      if ((m.commits || 0) > 10) badges.push('Streak Master');
+      return `
+      <div class="member-card">
+        <div class="member-name" style="font-weight:700">#${idx + 1} ${login}</div>
+        <div class="member-info">
+          <div style="display:flex; gap:8px; margin-top:4px;">
+            ${badges.map(b => `<span class="badge-pill">🎖️ ${b}</span>`).join('')}
+          </div>
+        </div>
+        <div style="font-family:monospace; color:var(--accent)">${(m.commits || 0) * 10} pts</div>
+      </div>`;
+    }).join('');
+  } else {
+    leaderboardEl.innerHTML = `<div class="empty-state">No leaderboard records syncable.</div>`;
+  }
+
+  const alertsEl = document.getElementById('smart-alerts-list');
+  const alerts = data.alerts || [];
+  if(alerts.length > 0) {
+    alertsEl.innerHTML = alerts.map(a => `
+      <div class="suggestion-item ${a.admin_priority ? 'alert-priority' : 'low'}">
+        <div class="suggestion-text">${a.message}</div>
+      </div>
+    `).join('');
+  } else {
+    alertsEl.innerHTML = '<div class="empty-state">No alerts flagged.</div>';
+  }
+}
+
+// ── AI Suggestions ──
+async function generateSuggestions() {
+  if (!activityData) return;
+  const btn = document.getElementById('ai-btn');
+  const listEl = document.getElementById('suggestion-list');
+  if (btn) {
+    btn.innerHTML = '<div class="spinner"></div>';
+    btn.disabled = true;
+  }
+  try {
+    const res = await apiFetch('/api/ai-suggestions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ activity: activityData })
+    });
+    const suggestions = res.suggestions || [];
+    if(suggestions.length > 0) {
+      listEl.innerHTML = suggestions.map(s => `
+        <div class="suggestion-item info">
+          <div class="suggestion-text">${s}</div>
+        </div>
+      `).join('');
+    } else {
+      listEl.innerHTML = '<div class="empty-state">No recommendations found.</div>';
+    }
+  } catch(e) {
+    console.error(e);
+  } finally {
+    if (btn) {
+      btn.innerHTML = '<i class="fa fa-wand-magic-sparkles"></i> Generate';
+      btn.disabled = false;
+    }
+  }
+}
+
+async function loadCommits() {
+  const commitsList = document.getElementById('commits-list');
+  if (!currentRepo) return;
+  try {
+    const data = await apiFetch(`/api/commits?repo=${encodeURIComponent(currentRepo)}`);
+    if (data && data.length > 0) {
+      commitsList.innerHTML = data.map(c => `
+        <div class="commit-item">
+          <div class="commit-sha">${c.sha ? c.sha.substring(0, 7) : 'xxxxxxx'}</div>
+          <div class="commit-msg">
+            <div style="font-weight:600;color:var(--text-primary)">${c.commit?.message || 'No message'}</div>
+            <div class="commit-author">${c.author_name || 'Unknown Author'} <span class="commit-author-handle">@${c.author?.login || 'ghost'}</span></div>
+          </div>
+          <div class="commit-date">${c.commit?.author?.date ? new Date(c.commit.author.date).toLocaleDateString() : ''}</div>
+        </div>
+      `).join('');
+    } else {
+      commitsList.innerHTML = '<div class="empty-state">No commits found template.</div>';
+    }
+  } catch (e) {
+    commitsList.innerHTML = `<div class="empty-state">❌ ${e.message}</div>`;
+  }
+}
+
+// ── CODE SCAN FUNCTION ──
+async function runScan() {
+  if (!currentRepo) return;
+  const btn = document.getElementById('scan-btn');
+  const resEl = document.getElementById('scan-results');
+  const sumEl = document.getElementById('scan-summary-area');
+  
+  if (btn) {
+    btn.innerHTML = '<div class="spinner"></div> Scanning Codebase...';
+    btn.disabled = true;
+  }
+  
+  sumEl.innerHTML = '';
+  resEl.innerHTML = '<div class="loading-state"><div class="spinner"></div>Initializing server-side static analyzer compiler pipes...</div>';
+  
+  try {
+    const data = await apiFetch('/api/scan-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ repo: currentRepo })
+    });
+    
+    const summary = data.summary || { critical: 0, high: 0, medium: 0, low: 0, info: 0 };
+    sumEl.innerHTML = `
+      <div class="scan-summary">
+        <div class="scan-stat"><div class="scan-stat-num" style="color:var(--red)">${summary.critical}</div><div class="scan-stat-lbl">Critical</div></div>
+        <div class="scan-stat"><div class="scan-stat-num" style="color:var(--amber)">${summary.high}</div><div class="scan-stat-lbl">High</div></div>
+        <div class="scan-stat"><div class="scan-stat-num" style="color:var(--accent)">${summary.medium}</div><div class="scan-stat-lbl">Medium</div></div>
+        <div class="scan-stat"><div class="scan-stat-num" style="color:var(--text-muted)">${summary.low}</div><div class="scan-stat-lbl">Low</div></div>
+        <div class="scan-stat"><div class="scan-stat-num">${summary.info || 0}</div><div class="scan-stat-lbl">Info</div></div>
+      </div>
+    `;
+    
+    const results = data.results || [];
+    if(results.length > 0) {
+      resEl.innerHTML = results.map(r => `
+        <div class="scan-file">
+          <div class="scan-file-name"><i class="fa fa-file-code"></i> ${r.file}</div>
+          ${r.issues.map(i => `
+            <div class="scan-issue ${i.severity.toLowerCase()}">
+              <div class="issue-line">Line ${i.line}</div>
+              <div class="issue-msg">${i.message}</div>
+            </div>
+          `).join('')}
+        </div>
+      `).join('');
+    } else {
+      resEl.innerHTML = '<div class="empty-state">🎉 Excellent! Code structure is fully secured!</div>';
+    }
+  } catch(e) {
+    sumEl.innerHTML = ''; 
+    resEl.innerHTML = `
+      <div class="terminal-error-box">
+        <div class="terminal-title">❌ CRITICAL CODE ANALYSIS RUNTIME INTERRUPT</div>
+        <div style="font-size: 13px; color:var(--text-secondary); margin-top:6px;">
+          The system scan compilation request failed. The local session authentication context parameters returned an exception stack:
+        </div>
+        <div class="terminal-code">${e.message}</div>
+        <div style="font-size: 11px; color:var(--text-muted); margin-top: 10px; font-style: italic;">
+          💡 Action Hint: Check your application terminal console log. Verify if GITHUB_TOKEN or configuration keys inside your root .env are active.
+        </div>
+      </div>
+    `;
+  } finally {
+    if (btn) {
+      btn.innerHTML = '<i class="fa fa-magnifying-glass"></i> Scan Repository';
+      btn.disabled = false;
+    }
+  }
+}
+
+// ── SECURITY / SECRET SCAN ──
+async function runSecurityScan() {
+  if (!currentRepo) return;
+  const btn = document.getElementById('security-scan-btn');
+  const resEl = document.getElementById('security-results');
+
+  if (btn) {
+    btn.innerHTML = '<div class="spinner"></div> Scanning...';
+    btn.disabled = true;
+  }
+  resEl.innerHTML = '<div class="loading-state"><div class="spinner"></div>Scanning repository for exposed secrets…</div>';
+
+  try {
+    const data = await apiFetch('/api/security-scan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ repo: currentRepo })
+    });
+
+    if (data.status === 'error') {
+      resEl.innerHTML = `<div class="empty-state">❌ ${data.error_message}</div>`;
+      return;
+    }
+
+    const recs = data.recommendations || [];
+    if (recs.length === 0) {
+      resEl.innerHTML = `<div class="empty-state"><div class="empty-state-icon">✅</div>No sensitive environment files detected.</div>`;
+      return;
+    }
+
+    resEl.innerHTML = recs.map(r => `
+      <div class="suggestion-item ${r.status === 'Already Pushed' ? 'high' : 'medium'}" style="margin-bottom:12px;">
+        <div class="suggestion-header">
+          <span class="suggestion-user">${r.status === 'Already Pushed' ? '🚨' : '⚠️'} ${r.file}</span>
+          <span class="badge-pill">Risk: ${r.risk_level}</span>
+          <span class="badge-pill">${r.status}</span>
+        </div>
+        <div class="suggestion-text"><strong>Reason:</strong> ${r.reason}</div>
+        <div class="suggestion-text" style="margin-top:4px;"><strong>Recommended Action:</strong> ${r.recommended_action}</div>
+        <div class="suggestion-text" style="margin-top:6px;">${r.message}</div>
+      </div>
+    `).join('');
+  } catch (e) {
+    resEl.innerHTML = `<div class="empty-state">❌ ${e.message}</div>`;
+  } finally {
+    if (btn) {
+      btn.innerHTML = '<i class="fa fa-magnifying-glass"></i> Scan for Secrets';
+      btn.disabled = false;
+    }
+  }
+}
+
+// Global scope triggers
+async function triggerEmailNotifications() {
+  const btn = document.getElementById('email-nav-btn');
+  if(!currentRepo) {
+    alert('Please select a repository first.');
+    return;
+  }
+  try {
+    btn.innerHTML = '<div class="spinner"></div> Sending...';
+    await apiFetch(`/api/trigger-email?repo=${encodeURIComponent(currentRepo)}`, { method: 'POST' });
+    alert('Alert emails pushed successfully!');
+  } catch(e) {
+    alert('Failed to trigger notification: ' + e.message);
+  } finally {
+    btn.innerHTML = '<i class="fa fa-paper-plane"></i> Run Email Alerts';
+  }
+}
+
+window.onload = function() {
+  loadRepos();
+};
+</script>
+{% endblock %}

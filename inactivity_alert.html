@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>GitPulse Alert</title>
+</head>
+
+<body style="font-family: Arial; background-color:#f4f4f4; padding:20px;">
+
+  <div style="max-width:600px;margin:auto;background:#ffffff;border-radius:10px;overflow:hidden;">
+
+    <!-- Header -->
+    <div style="background:#6c5ce7;color:white;padding:20px;text-align:center;">
+      <h2>⚠ GitPulse Activity Alert</h2>
+    </div>
+
+    <!-- Body -->
+    <div style="padding:20px;">
+
+      <h3>Hello {{ name }},</h3>
+
+      <p>
+        We detected that you have been inactive for
+        <b style="color:red;">{{ days }} days</b>.
+      </p>
+
+      <p>
+        Please review your GitHub activity and update your tasks.
+      </p>
+
+      <hr>
+
+      <h4>Summary</h4>
+      <ul>
+        <li>Username: {{ username }}</li>
+        <li>Last Active: {{ last_active }}</li>
+        <li>Inactive Days: {{ days }}</li>
+      </ul>
+
+      <p style="margin-top:20px;">
+        GitPulse AI recommends checking pending tasks and PRs.
+      </p>
+
+    </div>
+
+    <!-- Footer -->
+    <div style="background:#f1f1f1;padding:10px;text-align:center;font-size:12px;">
+      GitPulse Monitoring System © 2026
+    </div>
+
+  </div>
+
+</body>
+</html>

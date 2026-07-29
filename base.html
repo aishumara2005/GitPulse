@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}GitPulse — Team Monitor{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    /* ── Design Tokens ── */
+    :root {
+      --bg-void:     #070B14;
+      --bg-base:     #0A0E1A;
+      --bg-surface:  #111827;
+      --bg-elevated: #1A2236;
+      --bg-glass:    rgba(17,24,39,0.7);
+      --border:      rgba(59,130,246,0.15);
+      --border-glow: rgba(59,130,246,0.4);
+
+      --accent:      #3B82F6;
+      --accent-soft: rgba(59,130,246,0.12);
+      --accent-glow: rgba(59,130,246,0.3);
+      --green:       #10B981;
+      --green-soft:  rgba(16,185,129,0.12);
+      --amber:       #F59E0B;
+      --amber-soft:  rgba(245,158,11,0.12);
+      --red:         #EF4444;
+      --red-soft:    rgba(239,68,68,0.12);
+      --purple:      #8B5CF6;
+      --purple-soft: rgba(139,92,246,0.12);
+
+      --text-primary:   #F1F5F9;
+      --text-secondary: #94A3B8;
+      --text-muted:     #475569;
+      --text-code:      #7DD3FC;
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-void);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Animated Background ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(59,130,246,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 90%, rgba(139,92,246,0.05) 0%, transparent 50%),
+        radial-gradient(ellipse 40% 30% at 50% 50%, rgba(16,185,129,0.03) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* ── Glass Card ── */
+    .glass {
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+    }
+    .glass:hover { border-color: var(--border-glow); }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500;
+      cursor: pointer; border: none; transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--accent); color: #fff;
+    }
+    .btn-primary:hover { background: #2563EB; transform: translateY(-1px); box-shadow: 0 4px 16px var(--accent-glow); }
+    .btn-ghost {
+      background: transparent; color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--text-primary); }
+    .btn-danger {
+      background: var(--red-soft); color: var(--red); border: 1px solid rgba(239,68,68,0.3);
+    }
+    .btn-danger:hover { background: var(--red); color: #fff; }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 99px;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+    }
+    .badge-green  { background: var(--green-soft);  color: var(--green); }
+    .badge-amber  { background: var(--amber-soft);  color: var(--amber); }
+    .badge-red    { background: var(--red-soft);    color: var(--red); }
+    .badge-blue   { background: var(--accent-soft); color: var(--accent); }
+    .badge-purple { background: var(--purple-soft); color: var(--purple); }
+
+    /* ── Spinner ── */
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Pulse dot ── */
+    .pulse-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 0 rgba(16,185,129,0.6);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%  { box-shadow: 0 0 0 0 rgba(16,185,129,0.6); }
+      70% { box-shadow: 0 0 0 8px rgba(16,185,129,0); }
+      100%{ box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    /* ── Toast ── */
+    #toast-container {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .toast {
+      padding: 12px 18px; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 500;
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      color: var(--text-primary);
+      animation: slideIn 0.3s ease;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .toast.success { border-color: var(--green); }
+    .toast.error   { border-color: var(--red); }
+    @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    {% block extra_styles %}{% endblock %}
+  </style>
+</head>
+<body>
+  {% block body %}{% endblock %}
+
+  <div id="toast-container"></div>
+
+  <script>
+    function toast(msg, type='info', duration=4000) {
+      const el = document.createElement('div');
+      const icons = { success: '✅', error: '❌', info: 'ℹ️', warn: '⚠️' };
+      el.className = `toast ${type}`;
+      el.innerHTML = `<span>${icons[type]||'•'}</span> ${msg}`;
+      document.getElementById('toast-container').appendChild(el);
+      setTimeout(() => el.remove(), duration);
+    }
+
+    async function apiFetch(url, opts={}) {
+      const r = await fetch(url, {
+        headers: { 'Content-Type': 'application/json' },
+        ...opts
+      });
+      if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e.error || r.statusText); }
+      return r.json();
+    }
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}GitPulse — Sign In{% endblock %}
+
+{% block extra_styles %}
+.login-wrap {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 1; padding: 24px;
+}
+.login-card {
+  width: 100%; max-width: 420px;
+  padding: 48px 40px;
+  text-align: center;
+}
+.logo-mark {
+  width: 64px; height: 64px;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  border-radius: 18px; margin: 0 auto 24px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 8px 32px var(--accent-glow);
+}
+.login-title {
+  font-size: 26px; font-weight: 700; letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+.login-sub {
+  color: var(--text-secondary); font-size: 14px; margin-bottom: 40px;
+}
+.divider {
+  display: flex; align-items: center; gap: 12px;
+  color: var(--text-muted); font-size: 12px; margin: 28px 0;
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.token-form { text-align: left; }
+.form-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; display: block; font-weight: 500; }
+.form-input {
+  width: 100%; padding: 10px 14px;
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  outline: none; transition: border-color 0.2s;
+}
+.form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.form-input::placeholder { color: var(--text-muted); }
+.error-box {
+  background: var(--red-soft); border: 1px solid rgba(239,68,68,0.3);
+  border-radius: var(--radius-sm); padding: 10px 14px;
+  color: var(--red); font-size: 13px; margin-bottom: 16px;
+}
+.features {
+  margin-top: 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  text-align: left;
+}
+.feature-item {
+  padding: 12px; border-radius: var(--radius-sm);
+  background: var(--bg-surface); border: 1px solid var(--border);
+  font-size: 12px; color: var(--text-secondary);
+  display: flex; align-items: flex-start; gap: 8px;
+}
+.feature-icon { font-size: 16px; flex-shrink: 0; }
+{% endblock %}
+
+{% block body %}
+<div class="login-wrap">
+  <div class="glass login-card">
+    <div class="logo-mark">⚡</div>
+    <h1 class="login-title">GitPulse</h1>
+    <p class="login-sub">GitHub Team Intelligence Platform</p>
+
+    {% if error %}
+    <div class="error-box"><i class="fa fa-triangle-exclamation"></i> {{ error }}</div>
+    {% endif %}
+
+    <!-- GitHub OAuth -->
+    <a href="/auth/github" class="btn btn-primary" style="width:100%; justify-content:center; padding:14px; font-size:15px;">
+      <i class="fab fa-github"></i> Continue with GitHub
+    </a>
+
+    <div class="divider">or use a Personal Access Token</div>
+
+    <!-- Manual Token -->
+    <form class="token-form" method="POST" action="/auth/manual">
+      <label class="form-label">GitHub Personal Access Token</label>
+      <input
+        class="form-input" type="password" name="token"
+        placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+        style="margin-bottom:12px;"
+      />
+      <button class="btn btn-ghost" type="submit" style="width:100%; justify-content:center;">
+        <i class="fa fa-key"></i> Sign in with Token
+      </button>
+    </form>
+
+    <div class="features">
+      <div class="feature-item">
+        <span class="feature-icon">🔐</span>
+        <span>Team-only access with GitHub auth</span>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">🤖</span>
+        <span>AI-powered member suggestions</span>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">🔍</span>
+        <span>Automated code error scanning</span>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">📊</span>
+        <span>Real-time activity dashboard</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
