@@ -22,7 +22,7 @@ insights through an interactive dashboard.
 -   🔐 GitHub OAuth Authentication
 -   📊 Repository Analytics
 -   👥 Contributor Insights
--   🤖 AI Recommendations
+  AI Recommendations
 -   🛡️ Security & Secret Scanner
 -   📈 Interactive Dashboard
 -   📧 Email Notifications
