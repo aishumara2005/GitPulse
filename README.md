@@ -97,6 +97,10 @@ python app.py
 ```
 ---
 
+## 🎥 Project Demo
+
+[▶️ Watch Project Demo](./WhatsApp%20Video%202026-07-07%20at%201.43.23%20PM.mp4)
+
 # 👥 Meet the Team
 
 <p align="center">
